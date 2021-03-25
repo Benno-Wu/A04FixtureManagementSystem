@@ -13,7 +13,7 @@ export class Purchase {
     id: number
     @Column()
     born: Date
-    @Column()
+    @Column("simple-array")
     state: Array<State>
     @Column()
     price: number

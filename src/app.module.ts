@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
 import { UselessModule } from './useless/useless.module';
@@ -31,8 +29,8 @@ import { AuthGuard } from './onion/auth.guard';
     url: `redis://123456@127.0.0.1:6379`
   }),
     UselessModule, UserModule, FixModule, SchedulingModule, PurchaseModule, FixtureModule, FileModule],
-  controllers: [AppController],
-  providers: [AppService, { provide: APP_GUARD, useClass: AuthGuard }],
+  controllers: [],
+  providers: [{ provide: APP_GUARD, useClass: AuthGuard }],
 })
 export class AppModule {
   constructor(private readonly connection: Connection) { }

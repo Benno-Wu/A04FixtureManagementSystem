@@ -25,7 +25,7 @@ export class User {
     password: string
     @Column()
     name: string
-    @Column()
+    @Column("simple-json")
     authority: Auth
 
     @Transform(({ value, key, obj, type }) => value.length, { toPlainOnly: true })

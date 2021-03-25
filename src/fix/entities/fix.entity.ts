@@ -15,7 +15,7 @@ export class Fix {
     born: Date
     @Column()
     note: string
-    @Column()
+    @Column("simple-array")
     state: Array<State>
     @Column()
     fixture: number | string
