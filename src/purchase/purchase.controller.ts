@@ -2,7 +2,9 @@ import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common'
 import { PurchaseService } from './purchase.service';
 import { CreatePurchaseDto, UpdatePurchaseDto } from './entities/purchase.dto';
 import { Paged } from 'src/utils';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('purchase')
 export class PurchaseController {
   constructor(private readonly purchaseService: PurchaseService) { }
@@ -13,11 +15,12 @@ export class PurchaseController {
   }
 
   @Post('request')
-  async request(@Body() dto) {
+  // more check todo
+  async request(@Body() dto: CreatePurchaseDto) {
     if (dto.state.length !== 1) {
       throw new Error('state-100')
     }
-    return await this.purchaseService.request(dto, dto.token);
+    return await this.purchaseService.request(dto, (<any>dto).token);
   }
 
   @Put('first')

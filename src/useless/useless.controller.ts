@@ -2,7 +2,10 @@ import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common'
 import { UselessService } from './useless.service';
 import { CreateUselessDto, UpdateUselessDto } from './entities/useless.dto';
 import { Paged } from 'src/utils';
+import { User } from 'src/user/entities/user.entity';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('useless')
 export class UselessController {
   constructor(private readonly uselessService: UselessService) { }
@@ -13,11 +16,11 @@ export class UselessController {
   }
 
   @Post('request')
-  async request(@Body() dto) {
+  async request(@Body() dto: CreateUselessDto) {
     if (dto.state.length != 1) {
       throw new Error('state-100');
     }
-    return await this.uselessService.request(dto, dto.token);
+    return await this.uselessService.request(dto, (<any>dto).token);
   }
 
   @Put('first')

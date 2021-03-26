@@ -12,7 +12,7 @@ export const codeMap = {
     'user-101': 'user wrong password',
     'user-102': 'user update fail',
     'scheduling-100': 'scheduling state conflict',
-    'fixture-100': `fixture's code already exist`,
+    'fixture-404': `fixture's code isn't existed`,
     'token-404': 'invalid token',
     'state-100': 'wrong state',
 

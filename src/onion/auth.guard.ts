@@ -9,20 +9,25 @@ import { AllowList, authMap } from "src/utils";
 export class AuthGuard implements CanActivate {
     constructor(private readonly redisService: RedisService) { }
 
-    canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
+    async canActivate(context: ExecutionContext): Promise<boolean> {
         const req: Request = context.switchToHttp().getRequest()
         const path = req.path.split('/').splice(1)
         if (path.length >= 2 && AllowList.includes(path[1])) {
             return true
         }
         let user: User
-        const token = req.headers.authorization
-        this.redisService.getClient().get(token, (e, res) => {
-            if (res !== 'OK') {
-                throw new Error("token-404")
-            }
-            user = JSON.parse(res)
+        const token = req.headers.authorization.slice(7)
+        console.log(token);
+
+        user = await new Promise((resolve, rej) => {
+            this.redisService.getClient().get(token, (e, res) => {
+                if (res !== 'OK') {
+                    rej(new HttpException("token-404", 400))
+                }
+                resolve(JSON.parse(res))
+            })
         })
+
         if (path.length < 2 || !checking(user, path))
             throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
 

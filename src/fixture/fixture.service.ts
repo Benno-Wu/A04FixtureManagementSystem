@@ -10,9 +10,11 @@ export class FixtureService {
   constructor(private connection: Connection,
     @InjectRepository(Fixture) private fixtureRepository: Repository<Fixture>) { }
 
-  async isNotExist(code: string) {
-    if (await this.fixtureRepository.findOne({ code })) {
-      throw new Error('fixture-100')
+  async isExist(code: string) {
+    try {
+      await this.fixtureRepository.findOneOrFail({ code })
+    } catch (error) {
+      throw new Error('fixture-404')
     }
   }
 

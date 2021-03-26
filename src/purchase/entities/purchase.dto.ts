@@ -10,6 +10,7 @@ export class CreatePurchaseDto {
     fixture: Array<Fixture>
 }
 
+// todo bug
 export class UpdatePurchaseDto extends PartialType(CreatePurchaseDto) {
     id: number
 }

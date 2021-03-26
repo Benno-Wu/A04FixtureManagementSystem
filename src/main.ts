@@ -8,13 +8,15 @@ import { ResponseInterceptor } from './onion/response.interceptor';
 import { picsPath } from './utils';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, { cors: { origin: /localhost$/ } })
-  app.useStaticAssets(join(__dirname, `..${picsPath}`))
+  const app = await NestFactory.create<NestExpressApplication>(AppModule,
+    { cors: { origin: /localhost$/ }, })
+  app.useStaticAssets(`${picsPath.slice(1)}`, { prefix: `${picsPath}/` })
   app.useGlobalFilters(new ExceptionFilter())
   app.useGlobalInterceptors(new ResponseInterceptor())
 
   const options = new DocumentBuilder()
     .setTitle('Nest-Server')
+    .addBearerAuth()
     .build()
   const document = SwaggerModule.createDocument(app, options)
   SwaggerModule.setup('api', app, document)

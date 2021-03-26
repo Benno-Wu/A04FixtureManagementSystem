@@ -55,6 +55,7 @@ export class PurchaseService {
   }
 
   async update(id: number, dto: UpdatePurchaseDto) {
+    // 根据id查，再改fixture对象&state... update
     return await this.connection.transaction(async manager => {
       dto.fixture.forEach(f => {
         f.state = dto.state.slice(-1)[0].bool ?

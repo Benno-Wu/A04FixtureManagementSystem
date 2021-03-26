@@ -9,6 +9,8 @@ export class CreateFixtureDto {
     pic: string
 }
 
+// 更改主要是swagger上好看些， 实际还是单id吧
 export class UpdateFixtureDto extends PartialType(CreateFixtureDto) {
+    // export class UpdateFixtureDto extends CreateFixtureDto) {
     id: number
 }

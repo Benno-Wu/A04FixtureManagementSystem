@@ -3,6 +3,7 @@ import { UserService } from './user.service';
 import { CreateUserDto, LoginUserDto, UpdateUserDto } from './entities/user.dto';
 import { Request } from 'express';
 import { Paged } from 'src/utils';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('user')
 export class UserController {
@@ -23,18 +24,22 @@ export class UserController {
     return await this.userService.login(dto)
   }
 
+  @ApiBearerAuth()
   @Get('self')
   self(@Body() dto) {
     return { ...dto.token, password: undefined }
   }
 
+  @ApiBearerAuth()
   @Post('all')
   async paged(@Body() paged: Paged) {
     return await this.userService.paged(paged)
   }
 
+  @ApiBearerAuth()
   @Put('all')
   async update(@Body() dto: UpdateUserDto, @Req() req: Request) {
+    // bug, request's token is operator, just expire that user!
     return await this.userService.update(dto.id, dto, req.headers.authorization);
   }
 }

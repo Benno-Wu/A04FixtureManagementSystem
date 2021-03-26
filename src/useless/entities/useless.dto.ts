@@ -8,6 +8,9 @@ export class CreateUselessDto {
     fixture: string
 }
 
-export class UpdateUselessDto extends PartialType(CreateUselessDto) {
+// export class UpdateUselessDto extends PartialType(CreateUselessDto) {
+export class UpdateUselessDto {
     id: number
+    state: Array<State>
+    fixture: string
 }
