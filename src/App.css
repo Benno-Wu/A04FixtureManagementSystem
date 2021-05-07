@@ -1,5 +1,15 @@
 @import '~antd/dist/antd.css';
 
+.logo{
+  font-size: 25px;
+  color: white;
+  margin: 10px;
+}
+
+.user{
+  margin:10px;
+}
+
 /* .App {
   text-align: center;
 }

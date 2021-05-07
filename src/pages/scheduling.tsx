@@ -1,5 +1,6 @@
-import React, { FC } from "react";
-import { Table } from 'antd';
+import React, { FC, useCallback, useEffect, useState } from "react";
+import { message, Table } from 'antd';
+import { iScheduling } from "../type&interface";
 
 const columns = [
     { title: 'Name', dataIndex: 'name', key: 'name' },
@@ -45,13 +46,34 @@ const data = [
 ];
 
 export const Scheduling: FC<any> = () => {
+    const [data, setData] = useState<iScheduling[]>([])
+    const [load, setLoad] = useState(true)
+    const [total, setTotal] = useState(0)
+    const $ = useCallback(async (num, size) => {
+        try {
+            const _ = await Api.pagedScheduling({ num, size })
+            console.log(_);
+            if (_.success) {
+                setData(_.data.list)
+                setTotal(_.data.total)
+            } else message.info(_.message)
+            setLoad(false)
+        } catch (error) {
+            message.info('网络错误，请重试')
+        }
+    }, [])
+
+    useEffect(() => {
+        const _ = async () => { await $(1, 10) }
+        _()
+    }, [$])
 
     return (<Table
         columns={columns}
         expandable={{
-            expandedRowRender: record => <p style={{ margin: 0 }}>{record.description}</p>,
-            rowExpandable: record => record.name !== 'Not Expandable',
+            expandedRowRender: record => <p style={{ margin: 0 }}>{record}</p>,
+            rowExpandable: record => record.user.name !== 'Not Expandable',
         }}
-        dataSource={data}
+        dataSource={data} loading={load} pagination={{ total, onChange: $ }}
     />)
 }

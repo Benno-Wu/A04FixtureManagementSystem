@@ -5,8 +5,7 @@ export { userActions } from './user'
 export const store = createStore(combineReducers({ user }),
     {
         user: {
-            born: new Date(),
-            name: 'unknown',
+            name: '未登录',
             user: 'unknown',
         }
     })

@@ -1,45 +1,29 @@
-import { Button, Popconfirm } from "antd";
+import { Button, Popconfirm, Spin } from "antd";
 import React, { FC } from "react";
 
-export const PopCheck: FC<any> = ({ text, onOk }) => {
-    const [visible, setVisible] = React.useState(false);
-    const [confirmLoading, setConfirmLoading] = React.useState(false);
+export const PopCheck: FC<{ text: string, onOk: () => Promise<any>, onCancel: Function }> = ({ text, onOk, onCancel }) => {
+    const [loading, setLoading] = React.useState(false);
 
-    const showPopconfirm = () => {
-        setVisible(true);
-    };
-
-    // const handleOk = async () => {
-    //     setConfirmLoading(true);
-    //     const bool = await onOk()
-    //     setTimeout(() => {
-    //         setVisible(false);
-    //         setConfirmLoading(false);
-    //     }, 2000);
-    // };
     async function handleOk() {
-        setConfirmLoading(true);
+        setLoading(true);
         await onOk()
-        // setTimeout(() => {
-        setVisible(false);
-        setConfirmLoading(false);
-        // }, 2000);
-    };
+        setLoading(false);
+    }
 
-    const handleCancel = () => {
-        console.log('Clicked cancel button');
-        setVisible(false);
-    };
+    const handleCancel = async () => {
+        setLoading(true);
+        await onCancel()
+        setLoading(false);
+    }
+
     return (<Popconfirm
         title="Approved?"
-        visible={visible}
         okText="Yes"
         onConfirm={handleOk}
-        okButtonProps={{ loading: confirmLoading }}
+        cancelText="No"
         onCancel={handleCancel}
     >
-        <Button type="primary" shape="round" onClick={showPopconfirm}>
-            {text}
-        </Button>
+        <Spin spinning={loading} />
+        <Button type="primary" shape="round">{text}</Button>
     </Popconfirm>)
 }

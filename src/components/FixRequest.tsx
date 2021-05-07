@@ -1,12 +1,20 @@
-import React, { Fragment, useState } from 'react';
-import { Modal, Button, Input, Space, Form, FormItemProps } from 'antd';
+import React, { Fragment, useEffect, useState } from 'react';
+import { Modal, Button, Input, Space, Form, FormItemProps, message } from 'antd';
 import { useCookieState, useDebounceFn } from "ahooks";
 import { store, userActions } from '../redux';
+import { iState } from '../type&interface';
 
 export const FixRequest = () => {
     const [form] = Form.useForm()
-    const user = store.getState().user
+    const [user, setUser] = useState(store.getState().user)
     const [isModalVisible, setIsModalVisible] = useState(false)
+
+    useEffect(() => {
+        const unsub = store.subscribe(() => {
+            setUser(store.getState().user)
+        })
+        return unsub
+    }, [])
 
     const showModal = () => {
         setIsModalVisible(true);
@@ -14,11 +22,17 @@ export const FixRequest = () => {
 
     const handleOk = async () => {
         try {
+            const state: iState[] = [{ username: user?.name ?? '', time: new Date(), desc: '申请维修', bool: true }]
             const values = await form.validateFields()
             console.log(values);
+            const _ = await Api.requestFix({ ...values, state })
+            console.log(_);
+            if (_.success) {
+                message.info('申请成功')
+            } else message.info(_.message)
             setIsModalVisible(false)
         } catch (error) {
-
+            message.info('网络错误，请重试')
         }
     };
 
@@ -32,14 +46,16 @@ export const FixRequest = () => {
     }, { wait: 200 })
 
     return (<Fragment>
-        <Button style={{ margin: 16 }} type="primary" onClick={showModal}>request</Button>
-        <Modal title="Request" visible={isModalVisible} onOk={handleOk} okText="request" onCancel={handleCancel}>
-            <Form form={form} initialValues={{ user }} >
+        <Button style={{ margin: 16 }} type="primary" onClick={showModal}>申请报修</Button>
+        {/* <Modal title="Request" visible={isModalVisible} onOk={handleOk} okText="request" onCancel={handleCancel}> */}
+        <Modal title="Request" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+            <Form form={form} initialValues={{ user: user?.name }} >
                 <Form.Item name="user" label="user">
                     <Input disabled />
                 </Form.Item>
-                <Form.Item name="fixture" label="fixture" hasFeedback
-                    validateTrigger="onBlur"
+                <Form.Item name="fixture" label="fixture"
+                    //  hasFeedback
+                    // validateTrigger="onBlur"
                     rules={[
                         // { required: true, message: `Please input fixture's code!` },
                         {
@@ -52,7 +68,7 @@ export const FixRequest = () => {
                                 // return test(value)
                                 console.log(value)
                                 await new Promise((res) => { setTimeout(res, 200); })
-                                return value == 1 ? Promise.resolve() : Promise.reject(new Error(`Please input fixture's code!`))
+                                // return value == 1 ? Promise.resolve() : Promise.reject(new Error(`Please input fixture's code!`))
                             }
                         }]}>
                     <Input placeholder="fixture's code" allowClear />
