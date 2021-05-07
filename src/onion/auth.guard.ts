@@ -21,7 +21,8 @@ export class AuthGuard implements CanActivate {
 
         user = await new Promise((resolve, rej) => {
             this.redisService.getClient().get(token, (e, res) => {
-                if (res !== 'OK') {
+                // if (res !== 'OK') {
+                if (!res) {
                     rej(new HttpException("token-404", 400))
                 }
                 resolve(JSON.parse(res))
@@ -41,5 +42,6 @@ export class AuthGuard implements CanActivate {
 const checking = (user: User, path: string[]) => {
     const _ = user.authority[path[0]]
     const __ = authMap[path[0]][path[1]]
-    return (_.toString(2) & __) === __
+    console.log(_, __, _.toString(2) & __.toString(2), (_.toString(2) & __.toString(2)) == __.toString(2))
+    return (_.toString(2) & __.toString(2)) == __.toString(2)
 }

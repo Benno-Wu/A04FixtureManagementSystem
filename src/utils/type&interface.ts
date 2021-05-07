@@ -29,7 +29,7 @@ export class Auth {
     @ApiProperty()
     fix: number
     @ApiProperty()
-    discard: number
+    useless: number
     @ApiProperty()
     user: number
     @ApiProperty()
