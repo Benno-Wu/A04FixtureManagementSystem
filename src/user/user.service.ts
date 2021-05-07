@@ -49,7 +49,8 @@ export class UserService {
   @UseInterceptors(ClassSerializerInterceptor)
   async paged(paged: Paged) {
     const qb = this.userRepository.createQueryBuilder('user')
-    return await qb.skip(paged.size * (paged.num - 1)).take(paged.size).getMany()
+    const total = await qb.getCount()
+    return { total, list: await qb.skip(paged.size * (paged.num - 1)).take(paged.size).getMany() }
   }
 
   @UseInterceptors(ClassSerializerInterceptor)

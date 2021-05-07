@@ -43,7 +43,11 @@ export class UselessService {
 
   async paged(paged: Paged) {
     const qb = this.uselessRepository.createQueryBuilder('useless')
-    return await qb.skip(paged.size * (paged.num - 1)).take(paged.size).getMany()
+    const total = await qb.getCount()
+    return {
+      list: await qb.skip(paged.size * (paged.num - 1)).take(paged.size).getMany(),
+      total
+    }
   }
 
   async update(id: number, dto: UpdateUselessDto) {

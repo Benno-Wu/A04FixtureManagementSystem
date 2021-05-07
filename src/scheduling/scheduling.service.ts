@@ -56,6 +56,7 @@ export class SchedulingService {
 
   async paged(paged: Paged) {
     const qb = this.schedulingRepository.createQueryBuilder('scheduling')
-    return await qb.skip(paged.size * (paged.num - 1)).take(paged.size).getMany()
+    const total = await qb.getCount()
+    return { total, list: await qb.skip(paged.size * (paged.num - 1)).take(paged.size).getMany() }
   }
 }

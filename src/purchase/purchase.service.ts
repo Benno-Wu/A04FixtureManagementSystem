@@ -51,7 +51,8 @@ export class PurchaseService {
 
   async paged(paged: Paged) {
     const qb = this.purchaseRepository.createQueryBuilder('purchase')
-    return await qb.skip(paged.size * (paged.num - 1)).take(paged.size).getMany()
+    const total = await qb.getCount()
+    return { total, list: await qb.skip(paged.size * (paged.num - 1)).take(paged.size).getMany() }
   }
 
   async update(id: number, dto: UpdatePurchaseDto) {

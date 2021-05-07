@@ -31,6 +31,9 @@ export class FixService {
 
   async request(dto: CreateFixDto, user: User) {
     const fixture = await this.fixtureRepository.findOne({ code: dto.fixture })
+    if (!fixture) {
+      throw new Error("fixture-404");
+    }
     const fix = new Fix()
     fix.born = new Date()
     fix.note = dto.note
@@ -45,7 +48,11 @@ export class FixService {
 
   async paged(paged: Paged) {
     const qb = this.fixRepository.createQueryBuilder('fix')
-    return await qb.skip(paged.size * (paged.num - 1)).take(paged.size).getMany()
+    const total = await qb.getCount()
+    return {
+      list: await qb.skip(paged.size * (paged.num - 1)).take(paged.size).getMany(),
+      total
+    }
   }
 
   async update(id: number, dto: UpdateFixDto) {
