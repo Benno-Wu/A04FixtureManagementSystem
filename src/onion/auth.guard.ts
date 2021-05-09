@@ -42,6 +42,6 @@ export class AuthGuard implements CanActivate {
 const checking = (user: User, path: string[]) => {
     const _ = user.authority[path[0]]
     const __ = authMap[path[0]][path[1]]
-    console.log(_, __, _.toString(2) & __.toString(2), (_.toString(2) & __.toString(2)) == __.toString(2))
-    return (_.toString(2) & __.toString(2)) == __.toString(2)
+    console.log(_, __, _.toString(2) & __.toString(2), (_ & __) === __)
+    return (_ & __) === __
 }

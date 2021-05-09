@@ -50,16 +50,24 @@ export class FixService {
     const qb = this.fixRepository.createQueryBuilder('fix')
     const total = await qb.getCount()
     return {
-      list: await qb.skip(paged.size * (paged.num - 1)).take(paged.size).getMany(),
+      list: await qb.leftJoinAndSelect("fix.user", "user")
+        .leftJoinAndSelect("fix.fixture_", "fixture")
+        .skip(paged.size * (paged.num - 1)).take(paged.size).getMany(),
       total
     }
   }
 
   async update(id: number, dto: UpdateFixDto) {
     return this.connection.transaction(async manager => {
-      dto.fixture_.state = dto.state.slice(-1)[0].bool ? 'in' : 'notFix'
-      Reflect.deleteProperty(dto, 'user')
-      await manager.update(Fix, id, <any>dto)
+      const _ = await manager.findOne(Fix, dto.id)
+      _.state = dto.state
+      await manager.save(_)
+      const __ = await manager.findOne(Fixture, dto.fixture_.id)
+      __.state = dto.state.slice(-1)[0].bool ? 'in' : 'notFix'
+      await manager.save(__)
+      // Reflect.deleteProperty(dto, 'user')
+      // Reflect.deleteProperty(dto, 'token')
+      // await manager.update(Fix, id, <any>dto)
     })
   }
 }

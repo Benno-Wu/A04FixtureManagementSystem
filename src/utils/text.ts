@@ -47,7 +47,7 @@ export const resultMap = (bool) => {
 
 export const picsPath = '/pics'
 
-export const AllowList = ['login', 'register', 'exist']
+export const AllowList = ['login', 'register', 'exist', 'upload']
 
 // 路径权限表
 export const authMap = {

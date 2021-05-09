@@ -15,7 +15,7 @@ export class Useless {
     born: Date
     @Column()
     note: string
-    @Column("simple-array")
+    @Column("simple-json")
     state: Array<State>
 
     @ManyToOne(() => User, user => user.useless)

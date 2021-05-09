@@ -10,7 +10,7 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "t
  */
 @Entity()
 export class Scheduling extends BaseEntity<Scheduling>{
-    @Column("simple-array")
+    @Column("simple-json")
     state: Array<State>
     @Column()
     user: number

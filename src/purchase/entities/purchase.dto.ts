@@ -13,4 +13,5 @@ export class CreatePurchaseDto {
 // todo bug
 export class UpdatePurchaseDto extends PartialType(CreatePurchaseDto) {
     id: number
+    purchaseId: number
 }

@@ -52,7 +52,14 @@ export class PurchaseService {
   async paged(paged: Paged) {
     const qb = this.purchaseRepository.createQueryBuilder('purchase')
     const total = await qb.getCount()
-    return { total, list: await qb.skip(paged.size * (paged.num - 1)).take(paged.size).getMany() }
+    // return { total, list: await qb.skip(paged.size * (paged.num - 1)).take(paged.size) }
+    return {
+      total,
+      list: await qb.leftJoinAndSelect("purchase.fixture", "fixture")
+        .skip(paged.size * (paged.num - 1))
+        .take(paged.size)
+        .getMany()
+    }
   }
 
   async update(id: number, dto: UpdatePurchaseDto) {
@@ -60,9 +67,13 @@ export class PurchaseService {
     return await this.connection.transaction(async manager => {
       dto.fixture.forEach(f => {
         f.state = dto.state.slice(-1)[0].bool ?
-          (dto.state.length === 2 ? 'in' : 'purchase') : 'notPurchase'
+          (dto.state.length === 3 ? 'in' : 'purchase') : 'notPurchase'
       })
-      await manager.update(Purchase, id, { state: dto.state, fixture: dto.fixture })
+      const _ = await manager.findOne(Purchase, dto.id)
+      _.fixture = dto.fixture
+      _.state = dto.state
+      await manager.save(_)
+      // await manager.update(Purchase, id, { state: dto.state, fixture: dto.fixture })
     })
   }
 }
