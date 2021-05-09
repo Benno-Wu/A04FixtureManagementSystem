@@ -1,7 +1,7 @@
 import { Button, Popconfirm, Spin } from "antd";
 import React, { FC } from "react";
 
-export const PopCheck: FC<{ text: string, onOk: () => Promise<any>, onCancel: Function }> = ({ text, onOk, onCancel }) => {
+export const PopCheck: FC<{ text: string, onOk: () => Promise<any>, onCancel: Function, }> = ({ text, onOk, onCancel, }) => {
     const [loading, setLoading] = React.useState(false);
 
     async function handleOk() {

@@ -74,3 +74,5 @@ export const roleMap = {
         user: 0b11,
     },
 }
+
+export const imgPath = 'http://localhost:3001'

@@ -37,14 +37,14 @@ export class Uploader extends React.Component<{ img: string, setImg: Function },
         if (info.file.status === 'done') {
             // Get this url from response in real world.
             // todo get the return url or something
-            getBase64(info.file.originFileObj, (imageUrl: any) =>
-                // todo
-                // this.props.setImg()
+            console.log('获得图片地址', info.file.response.data.url);
+            this.props.setImg(info.file.response.data.url)
+            getBase64(info.file.originFileObj, (imageUrl: any) => {
                 this.setState({
                     imageUrl,
                     loading: false,
-                }),
-            );
+                })
+            });
         }
     };
 
@@ -60,7 +60,7 @@ export class Uploader extends React.Component<{ img: string, setImg: Function },
             <Upload
                 listType="picture-card"
                 showUploadList={false}
-                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                action="http://127.0.0.1:3001/file/upload"
                 beforeUpload={beforeUpload}
                 onChange={this.handleChange}
                 maxCount={1}

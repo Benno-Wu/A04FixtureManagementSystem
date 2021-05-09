@@ -1,7 +1,8 @@
-import { Button, Form, Input, InputNumber, message, Modal, Table } from 'antd';
+import { Button, Form, Input, InputNumber, message, Modal, Table, Image } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import React, { FC, Fragment, useCallback, useEffect, useState } from 'react';
 import { Uploader } from '../components';
+import { imgPath } from '../constant';
 import { iFixture } from '../type&interface';
 
 export const Fixture: FC<any> = () => {
@@ -72,7 +73,10 @@ export const Fixture: FC<any> = () => {
     return (<Fragment>
         <Table scroll={{ x: 1200 }} columns={[
             { title: '编码', width: 100, dataIndex: 'code', key: 'code', fixed: 'left', },
-            { title: '图片', width: 100, dataIndex: 'pic', key: 'pic', fixed: 'left', },
+            {
+                title: '图片', width: 100, dataIndex: 'pic', key: 'pic', fixed: 'left',
+                render: (text, record, index) => <Image src={imgPath + text} />,
+            },
             { title: '名称', dataIndex: 'name', key: 'name', },
             { title: '用途', dataIndex: 'usedFor', key: 'usedFor', },
             { title: '使用次数', dataIndex: 'useCount', key: 'useCount', },

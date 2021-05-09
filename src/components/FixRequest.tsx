@@ -1,10 +1,10 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { FC, Fragment, useEffect, useState } from 'react';
 import { Modal, Button, Input, Space, Form, FormItemProps, message } from 'antd';
 import { useCookieState, useDebounceFn } from "ahooks";
 import { store, userActions } from '../redux';
 import { iState } from '../type&interface';
 
-export const FixRequest = () => {
+export const FixRequest: FC<{ reload: Function }> = ({ reload }) => {
     const [form] = Form.useForm()
     const [user, setUser] = useState(store.getState().user)
     const [isModalVisible, setIsModalVisible] = useState(false)
@@ -29,6 +29,7 @@ export const FixRequest = () => {
             console.log(_);
             if (_.success) {
                 message.info('申请成功')
+                reload()
             } else message.info(_.message)
             setIsModalVisible(false)
         } catch (error) {
