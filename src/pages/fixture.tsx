@@ -14,7 +14,7 @@ export const Fixture: FC<any> = () => {
     const [load, setLoad] = useState(true)
     const [total, setTotal] = useState(0)
 
-    const $ = useCallback(async (num, size) => {
+    const $ = useCallback(async (num = 1, size = 10) => {
         try {
             const _ = await Api.pagedFixture({ num, size })
             console.log(_);
@@ -37,12 +37,18 @@ export const Fixture: FC<any> = () => {
 
     const handleOk = async () => {
         try {
-            const values = await form.validateFields()
+            let values: any = await form.validateFields()
+            values = { ...fixture, ...values, ...{ pic: imgUrl } }
             console.log(values);
-            // todo update & img
+            const _ = await Api.updateFixture(values)
+            console.log(_);
+            if (_.success) {
+                message.info('修改成功')
+                $()
+            } else message.info(_.message)
             setIsModalVisible(false)
         } catch (error) {
-
+            message.info('网络异常，请稍后再试')
         }
     };
 
@@ -53,25 +59,10 @@ export const Fixture: FC<any> = () => {
     useEffect(() => {
         const _ = async () => { await $(1, 10) }
         _()
-        // let data: any[] = []
-        // for (let i = 0; i < 50; i++) {
-        //     data.push({
-        //         key: i,
-        //         code: Math.random().toString(16).slice(-5),
-        //         name: Math.random().toString(16).slice(-10),
-        //         usedFor: Math.random().toString(16).slice(-10),
-        //         useCount: (Math.random() * 10).toFixed(0) as unknown as number,
-        //         PMPeriod: (Math.random() * 10).toFixed(0) as unknown as number,
-        //         location: Math.random().toString(16).slice(-8),
-        //         pic: Math.random().toString(16).slice(-10),
-        //         state: Math.random().toString(16).slice(-5),
-        //     });
-        // }
-        // setData(data)
     }, [$])
 
     return (<Fragment>
-        <Table scroll={{ x: 1200 }} columns={[
+        <Table scroll={{ x: 1200 }} rowKey="id" columns={[
             { title: '编码', width: 100, dataIndex: 'code', key: 'code', fixed: 'left', },
             {
                 title: '图片', width: 100, dataIndex: 'pic', key: 'pic', fixed: 'left',
@@ -90,7 +81,7 @@ export const Fixture: FC<any> = () => {
                 },
             },
         ]} dataSource={data} loading={load} pagination={{ total, onChange: $ }} />
-        <Modal title="Update" destroyOnClose visible={isModalVisible} onOk={handleOk} okText="update" onCancel={handleCancel}>
+        <Modal title="Update" destroyOnClose visible={isModalVisible} onOk={handleOk} okText="确认修改" onCancel={handleCancel}>
             <Form form={form} initialValues={{ ...fixture }} preserve={false} >
                 <Form.Item name="code" label="code">
                     <Input disabled />
@@ -111,7 +102,7 @@ export const Fixture: FC<any> = () => {
                     <Input allowClear maxLength={25} />
                 </Form.Item>
                 <Form.Item name="pic" label="pic">
-                    <Uploader img={imgUrl} setImg={setImgUrl} />
+                    <Uploader img={imgPath + imgUrl} setImg={setImgUrl} />
                 </Form.Item>
                 <Form.Item name="state" label="state">
                     <Input disabled />

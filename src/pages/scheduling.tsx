@@ -1,55 +1,14 @@
 import React, { FC, useCallback, useEffect, useState } from "react";
-import { message, Table } from 'antd';
+import { message, Steps, Table, Image } from 'antd';
 import { iScheduling } from "../type&interface";
-
-const columns = [
-    { title: 'Name', dataIndex: 'name', key: 'name' },
-    { title: 'Age', dataIndex: 'age', key: 'age' },
-    { title: 'Address', dataIndex: 'address', key: 'address' },
-    {
-        title: 'Action',
-        dataIndex: '',
-        key: 'x',
-        render: () => <a>Delete</a>,
-    },
-];
-
-const data = [
-    {
-        key: 1,
-        name: 'John Brown',
-        age: 32,
-        address: 'New York No. 1 Lake Park',
-        description: 'My name is John Brown, I am 32 years old, living in New York No. 1 Lake Park.',
-    },
-    {
-        key: 2,
-        name: 'Jim Green',
-        age: 42,
-        address: 'London No. 1 Lake Park',
-        description: 'My name is Jim Green, I am 42 years old, living in London No. 1 Lake Park.',
-    },
-    {
-        key: 3,
-        name: 'Not Expandable',
-        age: 29,
-        address: 'Jiangsu No. 1 Lake Park',
-        description: 'This not expandable',
-    },
-    {
-        key: 4,
-        name: 'Joe Black',
-        age: 32,
-        address: 'Sidney No. 1 Lake Park',
-        description: 'My name is Joe Black, I am 32 years old, living in Sidney No. 1 Lake Park.',
-    },
-];
+import { SchedulingRequest } from "../components/SchedulingRequest";
+import { imgPath } from "../constant";
 
 export const Scheduling: FC<any> = () => {
     const [data, setData] = useState<iScheduling[]>([])
     const [load, setLoad] = useState(true)
     const [total, setTotal] = useState(0)
-    const $ = useCallback(async (num, size) => {
+    const $ = useCallback(async (num = 1, size = 10) => {
         try {
             const _ = await Api.pagedScheduling({ num, size })
             console.log(_);
@@ -68,12 +27,40 @@ export const Scheduling: FC<any> = () => {
         _()
     }, [$])
 
-    return (<Table
-        columns={columns}
-        expandable={{
-            expandedRowRender: record => <p style={{ margin: 0 }}>{record}</p>,
-            rowExpandable: record => record.user.name !== 'Not Expandable',
-        }}
-        dataSource={data} loading={load} pagination={{ total, onChange: $ }}
-    />)
+    return <><SchedulingRequest reload={$} />
+        <Table rowKey='id' dataSource={data} loading={load} pagination={{ total, onChange: $ }}
+            columns={[
+                { title: 'Id', dataIndex: 'id', key: 'id' },
+                {
+                    title: '申请人', dataIndex: 'user_', key: 'user_',
+                    render: (text, record, index) => <p>{text.name}</p>
+                },
+                {
+                    title: '工夹具', dataIndex: 'fixture_', key: 'fixture_',
+                    render: (text, record, index) =>
+                        <Image width={100} height={100} src={imgPath + text.pic} />
+                },
+                {
+                    title: '编码', dataIndex: 'fixture_', key: 'fixture_',
+                    render: (text, record, index) => <p>{text.code}</p>
+                },
+                {
+                    title: '位置', dataIndex: 'fixture_', key: 'fixture_',
+                    render: (text, record, index) => <p>{text.location}</p>
+                },
+                {
+                    title: '出入库', dataIndex: 'state', key: 'state',
+                    render: (t, record, index) => {
+                        const text = t.slice(-1)[0]
+                        return <Steps size="small" direction="horizontal">
+                            {<Steps.Step description={text?.time} subTitle={text?.desc}
+                                status={text?.bool ? 'error'
+                                    : (text?.bool !== undefined ? 'finish' : 'process')}
+                                title={text?.username}
+                            />}
+                        </Steps>
+                    },
+                },
+            ]}
+        /></>
 }
