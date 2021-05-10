@@ -28,6 +28,7 @@ export class FixtureService {
   }
 
   async update(id: number, dto: UpdateFixtureDto) {
+    Reflect.deleteProperty(dto, 'token')
     return await this.connection.transaction(async manager => {
       await manager.update(Fixture, id, dto)
     })

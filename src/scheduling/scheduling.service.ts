@@ -51,12 +51,17 @@ export class SchedulingService {
     scheduling.fixture_ = fixture
     return await this.connection.transaction(async manager => {
       await manager.save(scheduling)
+      await manager.save(fixture)
     })
   }
 
   async paged(paged: Paged) {
     const qb = this.schedulingRepository.createQueryBuilder('scheduling')
     const total = await qb.getCount()
-    return { total, list: await qb.skip(paged.size * (paged.num - 1)).take(paged.size).getMany() }
+    return {
+      total, list: await qb.leftJoinAndSelect("scheduling.user_", "user")
+        .leftJoinAndSelect("scheduling.fixture_", "fixture")
+        .skip(paged.size * (paged.num - 1)).take(paged.size).getMany()
+    }
   }
 }
