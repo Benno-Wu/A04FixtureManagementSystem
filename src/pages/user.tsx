@@ -1,49 +1,8 @@
-import React, { FC, useCallback, useEffect, useState } from "react";
-import { message, Table } from 'antd';
+import React, { FC, Fragment, useCallback, useEffect, useState } from "react";
+import { message, Progress, Table } from 'antd';
 import { iUser } from "../type&interface";
-
-const columns = [
-    { title: 'Name', dataIndex: 'name', key: 'name' },
-    { title: 'Age', dataIndex: 'age', key: 'age' },
-    { title: 'Address', dataIndex: 'address', key: 'address' },
-    {
-        title: 'Action',
-        dataIndex: '',
-        key: 'x',
-        render: () => <a>Delete</a>,
-    },
-];
-
-const data = [
-    {
-        key: 1,
-        name: 'John Brown',
-        age: 32,
-        address: 'New York No. 1 Lake Park',
-        description: 'My name is John Brown, I am 32 years old, living in New York No. 1 Lake Park.',
-    },
-    {
-        key: 2,
-        name: 'Jim Green',
-        age: 42,
-        address: 'London No. 1 Lake Park',
-        description: 'My name is Jim Green, I am 42 years old, living in London No. 1 Lake Park.',
-    },
-    {
-        key: 3,
-        name: 'Not Expandable',
-        age: 29,
-        address: 'Jiangsu No. 1 Lake Park',
-        description: 'This not expandable',
-    },
-    {
-        key: 4,
-        name: 'Joe Black',
-        age: 32,
-        address: 'Sidney No. 1 Lake Park',
-        description: 'My name is Joe Black, I am 32 years old, living in Sidney No. 1 Lake Park.',
-    },
-];
+import { roleMap } from "../constant";
+import { SafetyCertificateTwoTone } from "@ant-design/icons";
 
 export const User: FC<any> = () => {
     const [data, setData] = useState<iUser[]>([])
@@ -68,12 +27,23 @@ export const User: FC<any> = () => {
         _()
     }, [$])
 
-    return (<Table
-        columns={columns}
-        expandable={{
-            expandedRowRender: record => <p style={{ margin: 0 }}>{record}</p>,
-            rowExpandable: record => record.name !== 'Not Expandable',
-        }}
-        dataSource={data} loading={load} pagination={{ total, onChange: $ }}
+    return (<Table dataSource={data} loading={load} rowKey="id" pagination={{ total, onChange: $ }}
+        columns={[
+            { title: 'Id', dataIndex: 'id', key: 'id' },
+            { title: '编码/登录名', dataIndex: 'user', key: 'user' },
+            { title: '姓名', dataIndex: 'name', key: 'name' },
+            { title: '创建时间', dataIndex: 'born', key: 'born' },
+            {
+                title: '权限', dataIndex: 'authority', key: 'authority',
+                render: (v, record, index) => <>
+                    {Object.keys(v).map((key, i) => <Fragment key={i}>
+                        <SafetyCertificateTwoTone />
+                        {{ scheduling: '出入库', purchase: '采购', fix: '维修', useless: '报废', fixture: '工夹具', user: '用户', }[key]}
+                        <Progress percent={(v as any)[key] / (roleMap.admin as any)[key] * 100} status="active"
+                            format={(percent, successPercent) => percent?.toFixed(0) + '%'} />
+                    </Fragment>)}
+                </>
+            },
+        ]}
     />)
 }

@@ -1,57 +1,27 @@
-import React, { FC, useCallback, useEffect, useState } from "react";
-import { message, Table } from 'antd';
+import React, { FC, Fragment, useCallback, useEffect, useState } from "react";
+import { message, Steps, Table, Image } from 'antd';
 import { iUseless } from "../type&interface";
-
-const columns = [
-    { title: 'Name', dataIndex: 'name', key: 'name' },
-    { title: 'Age', dataIndex: 'age', key: 'age' },
-    { title: 'Address', dataIndex: 'address', key: 'address' },
-    {
-        title: 'Action',
-        dataIndex: '',
-        key: 'x',
-        render: () => <a>Delete</a>,
-    },
-];
-
-const data = [
-    {
-        key: 1,
-        name: 'John Brown',
-        age: 32,
-        address: 'New York No. 1 Lake Park',
-        description: 'My name is John Brown, I am 32 years old, living in New York No. 1 Lake Park.',
-    },
-    {
-        key: 2,
-        name: 'Jim Green',
-        age: 42,
-        address: 'London No. 1 Lake Park',
-        description: 'My name is Jim Green, I am 42 years old, living in London No. 1 Lake Park.',
-    },
-    {
-        key: 3,
-        name: 'Not Expandable',
-        age: 29,
-        address: 'Jiangsu No. 1 Lake Park',
-        description: 'This not expandable',
-    },
-    {
-        key: 4,
-        name: 'Joe Black',
-        age: 32,
-        address: 'Sidney No. 1 Lake Park',
-        description: 'My name is Joe Black, I am 32 years old, living in Sidney No. 1 Lake Park.',
-    },
-];
+import { UselessRequest } from "../components/UselessRequest";
+import { PopCheck } from "../components";
+import { imgPath } from "../constant";
+import { store } from "../redux";
 
 export const Useless: FC<any> = () => {
+    const [user, setUser] = useState(store.getState().user)
     const [data, setData] = useState<iUseless[]>([])
     const [load, setLoad] = useState(true)
     const [total, setTotal] = useState(0)
-    const $ = useCallback(async (num, size) => {
+
+    useEffect(() => {
+        const unsub = store.subscribe(() => {
+            setUser(store.getState().user)
+        })
+        return unsub
+    }, [])
+
+    const $ = useCallback(async (num = 1, size = 10) => {
         try {
-            const _ = await Api.pagedUseless({ num, size })
+            const _ = await Api.pagedUseless({ size, num })
             console.log(_);
             if (_.success) {
                 setData(_.data.list)
@@ -63,17 +33,78 @@ export const Useless: FC<any> = () => {
         }
     }, [])
 
+    const firstUseless = async (_: any) => {
+        _.fixture = _.fixture.id
+        try {
+            const { success, data, message: m } = await Api.firstUseless(_)
+            if (success) { $(1, 10) } else { message.info(m) }
+        } catch (e) {
+            message.info('网络异常，请稍后再试')
+        }
+    }
+    const finalUseless = async (_: any) => {
+        _.fixture = _.fixture.id
+        try {
+            const { success, data, message: m } = await Api.finalUseless(_)
+            if (success) { $(1, 10) } else { message.info(m) }
+        } catch (e) {
+            message.info('网络异常，请稍后再试')
+        }
+    }
+
     useEffect(() => {
         const _ = async () => { await $(1, 10) }
         _()
     }, [$])
 
-    return (<Table
-        columns={columns}
-        expandable={{
-            expandedRowRender: record => <p style={{ margin: 0 }}>{record}</p>,
-            rowExpandable: record => record.note !== 'Not Expandable',
-        }}
-        dataSource={data} loading={load} pagination={{ total, onChange: $ }}
-    />)
+    return <Fragment><UselessRequest reload={$} />
+        <Table
+            dataSource={data} loading={load} pagination={{ total, onChange: $ }} rowKey='id'
+            columns={[
+                { title: 'Id', dataIndex: 'id', key: 'id' },
+                {
+                    title: '申请人', dataIndex: 'user', key: 'user',
+                    render: (text, record, index) => <p>{text.name}</p>
+                },
+                {
+                    title: '工夹具', dataIndex: 'fixture', key: 'fixture',
+                    render: (text, record, index) => <Image width={100} height={100} src={imgPath + text.pic} />
+                },
+                { title: '备注', dataIndex: 'note', key: 'note' },
+                {
+                    title: '审批流程', dataIndex: 'state', key: 'state',
+                    render: (text, record, index) =>
+                        <Steps size="small" direction="horizontal">
+                            {Array(3).fill('').map((_, i) => (
+                                <Steps.Step description={text[i]?.time ?? ''}
+                                    subTitle={text[i]?.desc ?? ['', '初审', '终审'][i]} key={i}
+                                    status={text[i]?.bool ? 'finish' : (text[i]?.bool !== undefined ? 'error' : 'process')}
+                                    title={<PopCheck text={text[i]?.username ?? '待审核'}
+                                        onOk={
+                                            async () => {
+                                                if (i === 1) {
+                                                    record.state[i] = { username: user?.name ?? '', time: new Date(), desc: '初审通过', bool: true }
+                                                    await firstUseless(record)
+                                                } else if (i === 2) {
+                                                    record.state[i] = { username: user?.name ?? '', time: new Date(), desc: '终审通过', bool: true }
+                                                    await finalUseless(record)
+                                                }
+                                            }}
+                                        onCancel={
+                                            async () => {
+                                                if (i === 1) {
+                                                    record.state[i] = { username: user?.name ?? '', time: new Date(), desc: '初审未通过', bool: false }
+                                                    await firstUseless(record)
+                                                } else if (i === 2) {
+                                                    record.state[i] = { username: user?.name ?? '', time: new Date(), desc: '终审未通过', bool: false }
+                                                    await finalUseless(record)
+                                                }
+                                            }
+                                        }
+                                    />} />
+                            ))}
+                        </Steps>,
+                },
+            ]}
+        /></Fragment>
 }
