@@ -45,15 +45,19 @@ export class UselessService {
     const qb = this.uselessRepository.createQueryBuilder('useless')
     const total = await qb.getCount()
     return {
-      list: await qb.skip(paged.size * (paged.num - 1)).take(paged.size).getMany(),
+      list: await qb.leftJoinAndSelect('useless.fixture', 'fixture')
+        .leftJoinAndSelect('useless.user', 'user')
+        .skip(paged.size * (paged.num - 1)).take(paged.size).getMany(),
       total
     }
   }
 
   async update(id: number, dto: UpdateUselessDto) {
+    const fixture = await this.fixtureRepository.findOne({ id: <any>dto.fixture })
+    fixture.state = dto.state.slice(-1)[0].bool ? 'useless' : 'in'
     return await this.connection.transaction(async manager => {
       await manager.update(Useless, id, { state: dto.state })
-      await manager.update(Fixture, dto.fixture, { state: dto.state.slice(-1)[0].bool ? 'useless' : 'in' })
+      await manager.save(fixture)
     })
   }
 }

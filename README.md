@@ -12,6 +12,11 @@
 当然，其中也有预设计时没考虑的整合。
 一表一路径，一动作一路径的设定还是一类动作一路径，参数区别，更像取舍平衡的问题。
 
+## Bugs
+
+序列化失败：
+我们必须返回一个类的实体。如果你返回一个普通的 JavaScript 对象，例如，{user: new UserEntity()},该对象将不会被正常序列化。
+
 ## Description
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
