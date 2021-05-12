@@ -1,4 +1,4 @@
-import API, { apiF, BaseConfig, iApi, URN, bodyAsParams, iPipe, PipeRequest, PipeResponse, request } from "simplified-fetch"
+import API, { apiF, BaseConfig, iApi, URN, bodyAsParams, iPipe, PipeRequest, PipeResponse, request, iAborts } from "simplified-fetch"
 
 declare global {
     // var Api: iApi & Record<apis, apiF<{
@@ -16,7 +16,7 @@ type apis = 'registerUser' | 'loginUser' | 'selfUser' | 'allUser' | 'allUserPut'
     | 'pagedUseless' | 'requestUseless' | 'firstUseless' | 'finalUseless'
     | 'pagedScheduling' | 'addScheduling'
     | 'pagedPurchase' | 'requestPurchase' | 'firstPurchase' | 'finalPurchase'
-    | 'pagedFixture' | 'updateFixture'
+    | 'pagedFixture' | 'updateFixture' | 'searchFixture'
 
 // // todo minify this type
 type config = Record<apis, request>
@@ -43,6 +43,7 @@ const configs: config = {
     finalPurchase: { urn: '/purchase/final', config: { method: 'PUT' } },
     pagedFixture: { urn: '/fixture/paged' },
     updateFixture: { urn: '/fixture/update' },
+    searchFixture: { urn: '/fixture/search' },
 }
 
 API.init({
@@ -105,12 +106,13 @@ interface target extends iApi {
     finalUseless: apiF<res<any>>,
     pagedScheduling: apiF<res<any>>,
     addScheduling: apiF<res<any>>,
-    pagedPurchase: apiF<res<any>>
+    pagedPurchase: apiF<res<any>>,
     requestPurchase: apiF<res<any>>,
     firstPurchase: apiF<res<any>>,
     finalPurchase: apiF<res<any>>,
     pagedFixture: apiF<res<any>>,
     updateFixture: apiF<res<any>>,
+    searchFixture: apiF<res<any>>,
 }
 
 // export const created = API.create({}, {}) as target

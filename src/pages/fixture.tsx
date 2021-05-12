@@ -1,6 +1,5 @@
 import { Button, Form, Input, InputNumber, message, Modal, Table, Image } from 'antd';
-import { ColumnsType } from 'antd/es/table';
-import React, { FC, Fragment, useCallback, useEffect, useState } from 'react';
+import React, { FC, Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { Uploader } from '../components';
 import { imgPath } from '../constant';
 import { iFixture } from '../type&interface';
@@ -13,8 +12,31 @@ export const Fixture: FC<any> = () => {
     const [isModalVisible, setIsModalVisible] = useState(false)
     const [load, setLoad] = useState(true)
     const [total, setTotal] = useState(0)
+    const input = useRef<Input>(null)
 
-    const $ = useCallback(async (num = 1, size = 10) => {
+    const search = async (v: string) => {
+        if (!v.length) return $()
+        setLoad(true)
+        await $$(v)
+    }
+
+    const $$ = async (code: string, num = 1, size = 10) => {
+        try {
+            const { success, data, message: mess } = await Api.searchFixture({ size, num, code })
+            if (success) {
+                setData(data.fixture)
+                setTotal(data.total)
+            } else { message.info(mess) }
+            setLoad(false)
+        } catch (e) {
+            message.info('网络异常，请稍后再试')
+        }
+    }
+
+    const $ = async (num = 1, size = 10) => {
+        if (input.current?.input.value) {
+            return $$(input.current?.input.value, num, size)
+        }
         try {
             const _ = await Api.pagedFixture({ num, size })
             console.log(_);
@@ -26,7 +48,7 @@ export const Fixture: FC<any> = () => {
         } catch (error) {
             message.info('网络错误，请重试')
         }
-    }, [])
+    }
 
     const showModal = (record: iFixture) => {
         setFixture(record)
@@ -59,9 +81,11 @@ export const Fixture: FC<any> = () => {
     useEffect(() => {
         const _ = async () => { await $(1, 10) }
         _()
-    }, [$])
+    }, [])
 
     return (<Fragment>
+        <Input.Search placeholder="input fixture's code" enterButton="Search" size="large" loading={load}
+            allowClear style={{ padding: '20px 50px' }} onSearch={search} ref={input} />
         <Table scroll={{ x: 1200 }} rowKey="id" columns={[
             { title: '编码', width: 100, dataIndex: 'code', key: 'code', fixed: 'left', },
             {
