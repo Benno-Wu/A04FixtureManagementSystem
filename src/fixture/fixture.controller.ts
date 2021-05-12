@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
 import { FixtureService } from './fixture.service';
-import { CreateFixtureDto, UpdateFixtureDto } from './entities/fixture.dto';
+import { CreateFixtureDto, SearchFixtureDto, UpdateFixtureDto } from './entities/fixture.dto';
 import { Paged } from 'src/utils';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
@@ -22,5 +22,10 @@ export class FixtureController {
   @Post('update')
   async update(@Body() dto: UpdateFixtureDto) {
     return await this.fixtureService.update(dto.id, dto)
+  }
+
+  @Post('search')
+  async search(@Body() dto: SearchFixtureDto) {
+    return await this.fixtureService.search(dto)
   }
 }

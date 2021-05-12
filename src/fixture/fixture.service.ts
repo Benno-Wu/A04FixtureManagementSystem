@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Paged } from 'src/utils';
-import { Connection, Repository } from 'typeorm';
-import { CreateFixtureDto, UpdateFixtureDto } from './entities/fixture.dto';
+import { Connection, Like, Repository } from 'typeorm';
+import { CreateFixtureDto, SearchFixtureDto, UpdateFixtureDto } from './entities/fixture.dto';
 import { Fixture } from './entities/fixture.entity';
 
 @Injectable()
@@ -32,5 +32,10 @@ export class FixtureService {
     return await this.connection.transaction(async manager => {
       await manager.update(Fixture, id, dto)
     })
+  }
+
+  async search(dto: SearchFixtureDto) {
+    const [fixture, total] = await this.fixtureRepository.findAndCount({ code: Like(`%${dto.code}%`) })
+    return { total, fixture: fixture.slice((dto.num - 1) * dto.size, dto.num * dto.size) }
   }
 }
