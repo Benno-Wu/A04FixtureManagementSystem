@@ -1,28 +1,24 @@
-import API, { apiF, BaseConfig, iApi, URN, bodyAsParams, iPipe, PipeRequest, PipeResponse, request, iAborts } from "simplified-fetch"
+import API, { apiF, iApi, request, URN } from "simplified-fetch"
+import { baseURL } from './constant'
 
 declare global {
-    // var Api: iApi & Record<apis, apiF<{
-    //     success: boolean,
-    //     data: unknown,
-    //     message: string,
-    // }>>
-    var Api: target
+    var Api: iApi & Apis
 }
 
-// type apiF<T> = (body?: bodyAsParams, params?: Array<unknown>) => Promise<T>
+// type apis = 'registerUser' | 'loginUser' | 'selfUser' | 'allUser' | 'allUserPut'
+//     | 'requestFix' | 'pagedFix' | 'finalFix'
+//     | 'pagedUseless' | 'requestUseless' | 'firstUseless' | 'finalUseless'
+//     | 'pagedScheduling' | 'addScheduling'
+//     | 'pagedPurchase' | 'requestPurchase' | 'firstPurchase' | 'finalPurchase'
+//     | 'pagedFixture' | 'updateFixture' | 'searchFixture'
 
-type apis = 'registerUser' | 'loginUser' | 'selfUser' | 'allUser' | 'allUserPut'
-    | 'requestFix' | 'pagedFix' | 'finalFix'
-    | 'pagedUseless' | 'requestUseless' | 'firstUseless' | 'finalUseless'
-    | 'pagedScheduling' | 'addScheduling'
-    | 'pagedPurchase' | 'requestPurchase' | 'firstPurchase' | 'finalPurchase'
-    | 'pagedFixture' | 'updateFixture' | 'searchFixture'
+// type config = Record<apis, URN | request>
 
-// // todo minify this type
-type config = Record<apis, request>
-// type aaa = { urn: URN, config?: BaseConfig }
+type APIConfig<apis> = {
+    [propName in keyof apis]: request | URN;
+}
 
-const configs: config = {
+const configs: APIConfig<Apis> = {
     registerUser: { urn: `/user/register` },
     loginUser: { urn: `/user/login` },
     selfUser: { urn: `/user/self`, config: { method: 'GET' } },
@@ -43,12 +39,13 @@ const configs: config = {
     finalPurchase: { urn: '/purchase/final', config: { method: 'PUT' } },
     pagedFixture: { urn: '/fixture/paged' },
     updateFixture: { urn: '/fixture/update' },
-    searchFixture: { urn: '/fixture/search' },
+    searchFixture: '/fixture/search',
 }
 
 API.init({
-    baseURL: `http://127.0.0.1:3001`,
+    baseURL,
     method: 'POST',
+    mode: 'cors',
 }, configs)
 
 function getCookie(name: string) {
@@ -60,30 +57,11 @@ function getCookie(name: string) {
 }
 Api.request.use((url, config: any) => {
     config.headers['Authorization'] = 'Bearer ' + getCookie('a04');
-    return false
 })
 
-
-
-// type what = {
-//     [key in apis]: apiF<target[key]>
-// }
-
-// type a = {
-//     a: number,
-//     b: number,
-//     c: string,
-// }
-// type aa = 'a' | 'b' | 'c'
-
-// class test<T extends string, R extends object>{
-//     constructor(obj: Record<T, R>) {
-//         for (const key in Object.keys(obj)) {
-//             let a: R[key] = {};
-//             (<any>this)[key] = a
-//         }
-//     }
-// }
+Api.request.use((url, request) => {
+    console.log(request)
+})
 
 type res<T> = Promise<{
     success: boolean,
@@ -91,30 +69,27 @@ type res<T> = Promise<{
     message: string,
 }>
 
-interface target extends iApi {
-    registerUser: apiF<res<any>>,
-    loginUser: apiF<res<any>>,
-    selfUser: apiF<res<any>>,
-    allUser: apiF<res<any>>,
-    allUserPut: apiF<res<any>>,
-    requestFix: apiF<res<any>>,
-    pagedFix: apiF<res<any>>,
-    finalFix: apiF<res<any>>,
-    pagedUseless: apiF<res<any>>,
-    requestUseless: apiF<res<any>>,
-    firstUseless: apiF<res<any>>,
-    finalUseless: apiF<res<any>>,
-    pagedScheduling: apiF<res<any>>,
-    addScheduling: apiF<res<any>>,
-    pagedPurchase: apiF<res<any>>,
-    requestPurchase: apiF<res<any>>,
-    firstPurchase: apiF<res<any>>,
-    finalPurchase: apiF<res<any>>,
-    pagedFixture: apiF<res<any>>,
-    updateFixture: apiF<res<any>>,
-    searchFixture: apiF<res<any>>,
+// todo: change any to specific interface
+interface Apis {
+    registerUser: apiF<any, any, res<any>>,
+    loginUser: apiF<any, any, res<any>>,
+    selfUser: apiF<any, any, res<any>>,
+    allUser: apiF<any, any, res<any>>,
+    allUserPut: apiF<any, any, res<any>>,
+    requestFix: apiF<any, any, res<any>>,
+    pagedFix: apiF<any, any, res<any>>,
+    finalFix: apiF<any, any, res<any>>,
+    pagedUseless: apiF<any, any, res<any>>,
+    requestUseless: apiF<any, any, res<any>>,
+    firstUseless: apiF<any, any, res<any>>,
+    finalUseless: apiF<any, any, res<any>>,
+    pagedScheduling: apiF<any, any, res<any>>,
+    addScheduling: apiF<any, any, res<any>>,
+    pagedPurchase: apiF<any, any, res<any>>,
+    requestPurchase: apiF<any, any, res<any>>,
+    firstPurchase: apiF<any, any, res<any>>,
+    finalPurchase: apiF<any, any, res<any>>,
+    pagedFixture: apiF<any, any, res<any>>,
+    updateFixture: apiF<any, any, res<any>>,
+    searchFixture: apiF<any, any, res<any>>,
 }
-
-// export const created = API.create({}, {}) as target
-
-// created.getA(1)

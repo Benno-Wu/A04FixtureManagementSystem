@@ -106,5 +106,22 @@ export const Useless: FC<any> = () => {
                         </Steps>,
                 },
             ]}
+            expandable={{
+                expandedRowRender: record => <Table scroll={{ x: 1000 }} dataSource={[record.fixture]} pagination={false}
+                    columns={[
+                        { title: '编码', width: 100, dataIndex: 'code', key: 'code', fixed: 'left', },
+                        {
+                            title: '图片', width: 100, dataIndex: 'pic', key: 'pic', fixed: 'left',
+                            render: (text, record, index) => <Image src={imgPath + text} />,
+                        },
+                        { title: '名称', dataIndex: 'name', key: 'name', },
+                        { title: '用途', dataIndex: 'usedFor', key: 'usedFor', },
+                        { title: '使用次数', dataIndex: 'useCount', key: 'useCount', },
+                        { title: '点检周期', dataIndex: 'PMPeriod', key: 'PMPeriod', },
+                        { title: '存放位置', dataIndex: 'location', key: 'location', },
+                        { title: '当前状态', dataIndex: 'state', key: 'state', fixed: 'right', width: 100, },
+                    ]} />,
+                rowExpandable: record => record.fixture !== undefined,
+            }}
         /></Fragment>
 }

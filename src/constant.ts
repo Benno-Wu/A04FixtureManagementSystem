@@ -75,4 +75,5 @@ export const roleMap = {
     },
 }
 
-export const imgPath = 'http://localhost:3001'
+export const imgPath = 'http://192.168.1.199:3001'
+export const baseURL = 'http://192.168.1.199:3001'
