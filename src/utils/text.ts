@@ -3,6 +3,7 @@ export const codeMap = {
     '000r': 'read fail',
     '000u': 'update fail',
     '000d': 'remove fail',
+    'Forbidden': 'Forbidden',
     'redis-c': 'redis create fail',
     'redis-r': 'redis read fail',
     'redis-u': 'redis update fail',

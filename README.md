@@ -1,3 +1,8 @@
+# Run
+
+mysql & redis: src\app.module.ts
+项目监听端口: src\main.ts
+
 ## Note
 
 码字开发顺序是：entities & module->service->utils & onion->controller
@@ -16,20 +21,3 @@
 
 序列化失败：
 我们必须返回一个类的实体。如果你返回一个普通的 JavaScript 对象，例如，{user: new UserEntity()},该对象将不会被正常序列化。
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Running the app
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
